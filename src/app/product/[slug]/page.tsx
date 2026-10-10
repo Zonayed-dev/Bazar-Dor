@@ -3,6 +3,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getProductBySlug } from "@/lib/api";
 
+export const instant = false;
+
 type ProductPageProps = {
     params: Promise<{ slug: string }>;
 };
