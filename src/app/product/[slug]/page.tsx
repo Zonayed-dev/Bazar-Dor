@@ -1,6 +1,8 @@
 
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { headers } from "next/headers";
+import { redirect, notFound } from "next/navigation";
+import { auth } from "@/lib/auth";
 import { getProductBySlug } from "@/lib/api";
 
 export const instant = false;
@@ -27,6 +29,16 @@ const getUnit = (unit: string) => {
 export default async function ProductPage({
     params,
 }: ProductPageProps) {
+    const session = await auth.api.getSession({
+        headers: await headers(),
+    });
+
+    console.log("Product page session:", session);
+
+    if (!session) {
+        redirect("/signin");
+    }
+
     const { slug } = await params;
     const product = await getProductBySlug(slug);
 
@@ -50,7 +62,8 @@ export default async function ProductPage({
         markets.length > 0
             ? Math.round(
                 markets.reduce(
-                    (sum, market) => sum + (market.min + market.max) / 2,
+                    (sum, market) =>
+                        sum + (market.min + market.max) / 2,
                     0
                 ) / markets.length
             )
@@ -85,6 +98,7 @@ export default async function ProductPage({
                             <span className="badge badge-outline">
                                 {product.categoryNameBn}
                             </span>
+
                             <span className="badge badge-outline">
                                 {getUnit(product.unit)}
                             </span>
@@ -128,8 +142,8 @@ export default async function ProductPage({
                 </div>
 
                 <p className="mt-3 text-xs text-base-content/60">
-                    গড় দাম বাজারগুলোর সর্বনিম্ন ও সর্বোচ্চ দামের মধ্যবিন্দুর গড়
-                    হিসেবে হিসাব করা হয়েছে।
+                    গড় দাম বাজারগুলোর সর্বনিম্ন ও সর্বোচ্চ দামের
+                    মধ্যবিন্দুর গড় হিসেবে হিসাব করা হয়েছে।
                 </p>
             </section>
 
