@@ -2,7 +2,7 @@ import { createAuthClient } from "better-auth/react";
 
 export const authClient = createAuthClient({
     baseURL:
-        process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
+        process.env.NEXT_PUBLIC_APP_URL || "https://bazar-dor-sigma-eight.vercel.app/",
     socialProviders: {
         google: {
             clientId: process.env.GOOGLE_CLIENT_ID as string,
