@@ -1,6 +1,6 @@
 
 import Link from "next/link";
-
+import AuthButtons from "@/components/AuthButtons";
 
 const categories = [
     { name: "সব পণ্য", emoji: "🛒", href: "/#সব-পণ্য" },
@@ -14,24 +14,21 @@ const categories = [
     { name: "মসলা", emoji: "🌶️", href: "/category/mosla" },
 ];
 
-
 export default function Navbar() {
     return (
         <header className="border-b border-base-300 bg-base-100">
             <div className="navbar mx-auto max-w-6xl px-4">
                 <div className="navbar-start">
-                    <Link href="/" className="text-xl font-bold text-success sm:text-2xl">
+                    <Link
+                        href="/"
+                        className="text-xl font-bold text-success sm:text-2xl"
+                    >
                         🛒 বাজার দর
                     </Link>
                 </div>
 
                 <div className="navbar-end gap-2">
-                    <Link href="/signin" className="btn btn-ghost btn-sm">
-                        সাইন ইন
-                    </Link>
-                    <Link href="/signup" className="btn btn-success btn-sm">
-                        সাইন আপ
-                    </Link>
+                    <AuthButtons />
                 </div>
             </div>
 
