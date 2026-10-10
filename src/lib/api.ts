@@ -33,14 +33,14 @@ export type Category = {
 };
 
 export async function getProducts(): Promise<Product[]> {
-  const res = await fetch(`${BASE_URL}/products`, {
-    cache: "no-store",
-  });
+    const res = await fetch(`${BASE_URL}/products`, {
+        cache: "no-store",
+    });
 
-  if (!res.ok) throw new Error("Failed to fetch products");
+    if (!res.ok) throw new Error("Failed to fetch products");
 
-  const data = await res.json();
-  return Array.isArray(data) ? data : data.products;
+    const data = await res.json();
+    return Array.isArray(data) ? data : data.products;
 }
 
 export async function getCategories(): Promise<Category[]> {
@@ -50,4 +50,42 @@ export async function getCategories(): Promise<Category[]> {
 
     const data = await res.json();
     return Array.isArray(data) ? data : data.categories;
+}
+
+
+export async function getProductBySlug(
+    slug: string
+): Promise<Product | null> {
+    const products = await getProducts();
+    const listedProduct = products.find(
+        (product) => product.slug === slug
+    );
+
+    if (!listedProduct) {
+        return null;
+    }
+
+    const res = await fetch(
+        `${BASE_URL}/products/${listedProduct.id}`,
+        { cache: "no-store" }
+    );
+
+    if (!res.ok) {
+        throw new Error("Failed to fetch product details");
+    }
+
+    const data = await res.json();
+    const product = data.product ?? data.data ?? data;
+
+    if (!product || typeof product !== "object") {
+        throw new Error("Invalid product response");
+    }
+
+    return {
+        ...listedProduct,
+        ...product,
+        markets: Array.isArray(product.markets)
+            ? product.markets
+            : listedProduct.markets ?? [],
+    } as Product;
 }
