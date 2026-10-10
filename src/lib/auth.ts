@@ -1,17 +1,13 @@
+
 import { betterAuth } from "better-auth";
 import { mongodbAdapter } from "@better-auth/mongo-adapter";
-import clientPromise from "@/lib/mongodb";
-
-const client = await clientPromise;
-const db = client.db(process.env.MONGODB_DB || "bazardor");
+import { dbPromise } from "@/lib/mongodb";
 
 export const auth = betterAuth({
-  database: mongodbAdapter(db, { client }),
+  database: mongodbAdapter(await dbPromise),
 
   emailAndPassword: {
     enabled: true,
+    minPasswordLength: 8,
   },
-
-  secret: process.env.BETTER_AUTH_SECRET,
-  baseURL: process.env.BETTER_AUTH_URL,
 });
