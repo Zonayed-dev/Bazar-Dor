@@ -31,9 +31,9 @@ export default function ProductCard({
 
                     <span
                         className={`badge ${isUp
-                                ? "badge-success"
+                                ? "badge-error"
                                 : isDown
-                                    ? "badge-error"
+                                    ? "badge-success"
                                     : "badge-ghost"
                             }`}
                     >

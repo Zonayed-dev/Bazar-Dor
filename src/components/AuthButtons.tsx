@@ -49,13 +49,19 @@ export default function AuthButtons() {
 
   return (
     <div className="flex items-center gap-2">
-      <Link href="/signin" className="btn btn-outline btn-sm">
+      <Link
+        href="/signin"
+        className="btn btn-outline btn-success btn-sm"
+      >
         Sign In
       </Link>
 
-      <Link href="/signup" className="btn btn-primary btn-sm">
+      <Link
+        href="/signup"
+        className="btn btn-success btn-sm"
+      >
         Sign Up
       </Link>
     </div>
   );
-}
+} 
