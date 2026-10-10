@@ -4,24 +4,24 @@ import { MongoClient } from "mongodb";
 const uri = process.env.MONGODB_URI;
 
 if (!uri) {
-  throw new Error("Missing MONGODB_URI in .env.local");
+  throw new Error("Missing MONGODB_URI environment variable");
 }
 
-const client = new MongoClient(uri);
+const options = {};
 
 const globalWithMongo = globalThis as typeof globalThis & {
-  _mongoClientPromise?: Promise<MongoClient>;
+  _mongoClient?: MongoClient;
 };
 
-const clientPromise =
-  globalWithMongo._mongoClientPromise ?? client.connect();
+const client =
+  globalWithMongo._mongoClient ?? new MongoClient(uri);
 
 if (process.env.NODE_ENV !== "production") {
-  globalWithMongo._mongoClientPromise = clientPromise;
+  globalWithMongo._mongoClient = client;
 }
 
-export default clientPromise;
-
-export const dbPromise = clientPromise.then((client) =>
-  client.db(process.env.MONGODB_DB || "bazardor")
+export const db = client.db(
+  process.env.MONGODB_DB || "bazardor"
 );
+
+export default client;
