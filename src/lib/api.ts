@@ -1,4 +1,5 @@
-const BASE_URL = "https://api.abcz.workers.dev/api/bazardor";
+
+const BASE_URL = "https://openapi.programming-hero.com/api/bazardor";
 
 export type Product = {
     id: number;
@@ -32,31 +33,81 @@ export type Category = {
     icon: string;
 };
 
-export async function getProducts(): Promise<Product[]> {
-    const res = await fetch(`${BASE_URL}/products`, {
+async function fetchJson(path: string) {
+    const response = await fetch(`${BASE_URL}${path}`, {
         cache: "no-store",
     });
 
-    if (!res.ok) throw new Error("Failed to fetch products");
+    if (!response.ok) {
+        throw new Error(`API request failed: ${path} (${response.status})`);
+    }
 
-    const data = await res.json();
-    return Array.isArray(data) ? data : data.products;
+    return response.json();
 }
 
 export async function getCategories(): Promise<Category[]> {
-    const res = await fetch(`${BASE_URL}/categories`);
+    const data = await fetchJson("/categories");
+    const categories = data.categories ?? data.data ?? data;
 
-    if (!res.ok) throw new Error("Failed to fetch categories");
+    if (!Array.isArray(categories)) {
+        throw new Error("Invalid categories response");
+    }
 
-    const data = await res.json();
-    return Array.isArray(data) ? data : data.categories;
+    return categories;
 }
 
+export async function getCategoryBySlug(
+    slug: string
+): Promise<Category | null> {
+    const categories = await getCategories();
+
+    const category = categories.find(
+        (item) => item.slug === slug || item.id === slug
+    );
+
+    if (!category) {
+        return null;
+    }
+
+    const data = await fetchJson(
+        `/categories/${encodeURIComponent(category.id)}`
+    );
+
+    return data.category ?? data.data ?? data;
+}
+
+export async function getProducts(): Promise<Product[]> {
+    const data = await fetchJson("/products");
+    const products = data.products ?? data.data ?? data;
+
+    if (!Array.isArray(products)) {
+        throw new Error("Invalid products response");
+    }
+
+    return products;
+}
+
+export async function getProductsByCategory(
+    category: string
+): Promise<Product[]> {
+    const data = await fetchJson(
+        `/products?category=${encodeURIComponent(category)}`
+    );
+
+    const products = data.products ?? data.data ?? data;
+
+    if (!Array.isArray(products)) {
+        throw new Error("Invalid category products response");
+    }
+
+    return products;
+}
 
 export async function getProductBySlug(
     slug: string
 ): Promise<Product | null> {
     const products = await getProducts();
+
     const listedProduct = products.find(
         (product) => product.slug === slug
     );
@@ -65,20 +116,11 @@ export async function getProductBySlug(
         return null;
     }
 
-    const res = await fetch(
-        `${BASE_URL}/products/${listedProduct.id}`,
-        { cache: "no-store" }
-    );
-
-    if (!res.ok) {
-        throw new Error("Failed to fetch product details");
-    }
-
-    const data = await res.json();
+    const data = await fetchJson(`/products/${listedProduct.id}`);
     const product = data.product ?? data.data ?? data;
 
     if (!product || typeof product !== "object") {
-        throw new Error("Invalid product response");
+        throw new Error("Invalid product details response");
     }
 
     return {
